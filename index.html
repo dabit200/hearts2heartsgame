@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hearts2Hearts Game</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+    }
+
+    #menu {
+        position: absolute;
+        width: 100%;
+        height: 100vh;
+        background: #ffcce6;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    #playBtn {
+        padding: 20px 60px;
+        font-size: 32px;
+        border: none;
+        border-radius: 20px;
+        background: #7ed6ff;
+        color: white;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    #playBtn:hover {
+        transform: scale(1.1);
+    }
+
+    #characterSelect {
+        position: absolute;
+        width: 100%;
+        height: 100vh;
+        background: #ffd6eb;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        overflow-y: auto;
+        padding-top: 40px;
+    }
+
+    #characterSelect h1 {
+        margin-bottom: 30px;
+        color: #ff4da6;
+    }
+
+    .character-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        width: 90%;
+        gap: 20px;
+    }
+
+    .char-card {
+        background: white;
+        border-radius: 20px;
+        padding: 10px;
+        text-align: center;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .char-card:hover {
+        transform: scale(1.05);
+    }
+
+    .char-card img {
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+    }
+
+    #game {
+        display: none;
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        background: linear-gradient(to bottom, #7ec8ff 0%, #7ec8ff 70%, #5ac85a 70%, #5ac85a 100%);
+    }
+
+    .cloud {
+        position: absolute;
+        width: 120px;
+        opacity: 0.8;
+    }
+
+    .player {
+        position: absolute;
+        width: 90px;
+        height: 90px;
+        object-fit: contain;
+    }
+
+    #controls {
+        position: absolute;
+        bottom: 20px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        z-index: 10;
+    }
+
+    .control-btn {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        border: none;
+        font-size: 28px;
+        background: rgba(255,255,255,0.7);
+    }
+</style>
+</head>
+<body>
+
+<div id="menu">
+    <button id="playBtn">PLAY</button>
+</div>
+
+<div id="characterSelect">
+    <h1>Pilih Karakter</h1>
+
+    <div class="character-grid" id="characterGrid"></div>
+</div>
+
+<div id="game">
+
+    <img src="cloud.png" class="cloud" style="top:50px; left:100px;">
+    <img src="cloud.png" class="cloud" style="top:120px; left:500px;">
+    <img src="cloud.png" class="cloud" style="top:80px; left:900px;">
+
+    <div id="controls">
+        <button class="control-btn" id="leftBtn">◀</button>
+        <button class="control-btn" id="jumpBtn">⬆</button>
+        <button class="control-btn" id="rightBtn">▶</button>
+    </div>
+</div>
+
+<audio id="bgm" loop>
+    <source src="Rude.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const characters = [
+    "Yuha.png",
+    "Carmen.png",
+    "Jiwoo.png",
+    "Yeon.png",
+    "Ian.png",
+    "Ana.png",
+    "Juun.png"
+];
+
+const menu = document.getElementById("menu");
+const playBtn = document.getElementById("playBtn");
+const characterSelect = document.getElementById("characterSelect");
+const characterGrid = document.getElementById("characterGrid");
+const game = document.getElementById("game");
+const bgm = document.getElementById("bgm");
+
+let selectedPlayer = null;
+let player = null;
+let playerX = 300;
+let playerY = 0;
+let velocityY = 0;
+let isJumping = false;
+let moveLeft = false;
+let moveRight = false;
+
+playBtn.onclick = () => {
+    menu.style.display = "none";
+    characterSelect.style.display = "flex";
+
+    bgm.play();
+};
+
+characters.forEach(char => {
+    const card = document.createElement("div");
+    card.className = "char-card";
+
+    card.innerHTML = `
+        <img src="${char}">
+        <p>${char.replace('.png', '')}</p>
+    `;
+
+    card.onclick = () => startGame(char);
+
+    characterGrid.appendChild(card);
+});
+
+function startGame(charName) {
+    selectedPlayer = charName;
+
+    characterSelect.style.display = "none";
+    game.style.display = "block";
+
+    createPlayer();
+    createNPCs();
+
+    update();
+}
+
+function createPlayer() {
+    player = document.createElement("img");
+    player.src = selectedPlayer;
+    player.className = "player";
+    player.style.left = playerX + "px";
+    player.style.bottom = "120px";
+
+    game.appendChild(player);
+}
+
+function createNPCs() {
+    let others = characters.filter(c => c !== selectedPlayer);
+
+    others.forEach((npcChar, index) => {
+        const npc = document.createElement("img");
+
+        npc.src = npcChar;
+        npc.className = "player";
+
+        let x = 100 + index * 150;
+        let direction = 1;
+
+        npc.style.left = x + "px";
+        npc.style.bottom = "120px";
+
+        game.appendChild(npc);
+
+        setInterval(() => {
+            x += 2 * direction;
+
+            if (x > window.innerWidth - 100) direction = -1;
+            if (x < 0) direction = 1;
+
+            npc.style.left = x + "px";
+        }, 16);
+    });
+}
+
+function update() {
+
+    if (moveLeft) playerX -= 5;
+    if (moveRight) playerX += 5;
+
+    velocityY -= 0.5;
+    playerY += velocityY;
+
+    if (playerY <= 0) {
+        playerY = 0;
+        velocityY = 0;
+        isJumping = false;
+    }
+
+    player.style.left = playerX + "px";
+    player.style.bottom = (120 + playerY) + "px";
+
+    requestAnimationFrame(update);
+}
+
+function jump() {
+    if (!isJumping) {
+        velocityY = 12;
+        isJumping = true;
+    }
+}
+
+// Keyboard
+
+document.addEventListener("keydown", e => {
+    if (e.key === "ArrowLeft") moveLeft = true;
+    if (e.key === "ArrowRight") moveRight = true;
+    if (e.key === " ") jump();
+});
+
+document.addEventListener("keyup", e => {
+    if (e.key === "ArrowLeft") moveLeft = false;
+    if (e.key === "ArrowRight") moveRight = false;
+});
+
+// Mobile controls
+
+document.getElementById("leftBtn").ontouchstart = () => moveLeft = true;
+document.getElementById("leftBtn").ontouchend = () => moveLeft = false;
+
+document.getElementById("rightBtn").ontouchstart = () => moveRight = true;
+document.getElementById("rightBtn").ontouchend = () => moveRight = false;
+
+document.getElementById("jumpBtn").ontouchstart = () => jump();
+
+// Mouse support
+
+document.getElementById("leftBtn").onmousedown = () => moveLeft = true;
+document.getElementById("leftBtn").onmouseup = () => moveLeft = false;
+
+document.getElementById("rightBtn").onmousedown = () => moveRight = true;
+document.getElementById("rightBtn").onmouseup = () => moveRight = false;
+
+document.getElementById("jumpBtn").onmousedown = () => jump();
+
+</script>
+
+</body>
+</html>
