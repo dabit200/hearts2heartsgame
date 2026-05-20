@@ -94,6 +94,158 @@
         background: linear-gradient(to bottom, #7ec8ff 0%, #7ec8ff 70%, #5ac85a 70%, #5ac85a 100%);
     }
 
+    #sun {
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: yellow;
+        top: 40px;
+        right: 50px;
+        box-shadow: 0 0 50px yellow;
+    }
+
+    #rainbow {
+        position: absolute;
+        width: 300px;
+        height: 150px;
+        border-top-left-radius: 300px;
+        border-top-right-radius: 300px;
+        border: 18px solid red;
+        border-bottom: none;
+        left: 80px;
+        top: 180px;
+        box-sizing: border-box;
+    }
+
+    #rainbow::before {
+        content: "";
+        position: absolute;
+        left: -18px;
+        top: -18px;
+        width: 264px;
+        height: 114px;
+        border-top-left-radius: 300px;
+        border-top-right-radius: 300px;
+        border: 18px solid orange;
+        border-bottom: none;
+    }
+
+    #house {
+        position: absolute;
+        width: 220px;
+        height: 200px;
+        background: #ffd6eb;
+        bottom: 120px;
+        right: 150px;
+        border: 5px solid #ff8ac2;
+    }
+
+    #roof {
+        position: absolute;
+        width: 0;
+        height: 0;
+        border-left: 130px solid transparent;
+        border-right: 130px solid transparent;
+        border-bottom: 120px solid #ff5ca8;
+        top: -120px;
+        left: -20px;
+    }
+
+    #door {
+        position: absolute;
+        width: 60px;
+        height: 110px;
+        background: #8b5a2b;
+        bottom: 0;
+        left: 80px;
+        cursor: pointer;
+    }
+
+    #houseInside {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: none;
+        background: #ffd6eb;
+        overflow: hidden;
+    }
+
+    .floor {
+        position: absolute;
+        width: 100%;
+        height: 180px;
+        background: #8b5a2b;
+        bottom: 0;
+    }
+
+    .furniture {
+        position: absolute;
+    }
+
+    #bed {
+        width: 220px;
+        height: 90px;
+        background: hotpink;
+        left: 60px;
+        bottom: 180px;
+        border-radius: 10px;
+    }
+
+    #table {
+        width: 120px;
+        height: 70px;
+        background: #c58a50;
+        left: 400px;
+        bottom: 180px;
+    }
+
+    #chair {
+        width: 50px;
+        height: 70px;
+        background: #a66a3f;
+        left: 550px;
+        bottom: 180px;
+    }
+
+    #wardrobe {
+        width: 120px;
+        height: 200px;
+        background: #b87442;
+        right: 80px;
+        bottom: 180px;
+    }
+
+    #diningTable {
+        width: 180px;
+        height: 80px;
+        background: #c58a50;
+        left: 700px;
+        bottom: 180px;
+    }
+
+    #food {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        background: yellow;
+        border-radius: 50%;
+        top: -25px;
+        left: 65px;
+        cursor: pointer;
+    }
+
+    #eatText {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 30px;
+        color: white;
+        display: none;
+        z-index: 99;
+    }
+
     .cloud {
         position: absolute;
         width: 120px;
@@ -166,6 +318,29 @@
 
 <div id="game">
 
+    <div id="sun"></div>
+    <div id="rainbow"></div>
+
+    <div id="house">
+        <div id="roof"></div>
+        <div id="door"></div>
+    </div>
+
+    <div id="houseInside">
+        <div id="eatText">Yummy! 🍔</div>
+
+        <div class="floor"></div>
+
+        <div class="furniture" id="bed"></div>
+        <div class="furniture" id="table"></div>
+        <div class="furniture" id="chair"></div>
+        <div class="furniture" id="wardrobe"></div>
+
+        <div class="furniture" id="diningTable">
+            <div id="food"></div>
+        </div>
+    </div>
+
     <div class="cloud" style="top:50px; left:100px;"></div>
     <div class="cloud" style="top:120px; left:500px;"></div>
     <div class="cloud" style="top:80px; left:900px;"></div>
@@ -188,9 +363,9 @@ const characters = [
     "Jiwoo.png",
     "Yeon.png",
     "Ian.png",
-    "Stella.png",
     "Ana.png",
-    "Juun.png"
+    "Juun.png",
+    "Stella.png"
 ];
 
 const menu = document.getElementById("menu");
@@ -329,6 +504,22 @@ document.getElementById("rightBtn").ontouchstart = () => moveRight = true;
 document.getElementById("rightBtn").ontouchend = () => moveRight = false;
 
 document.getElementById("jumpBtn").ontouchstart = () => jump();
+
+document.getElementById("door").onclick = () => {
+    document.getElementById("houseInside").style.display = "block";
+};
+
+const food = document.getElementById("food");
+const eatText = document.getElementById("eatText");
+
+food.onclick = () => {
+    eatText.style.display = "block";
+    food.style.display = "none";
+
+    setTimeout(() => {
+        eatText.style.display = "none";
+    }, 2000);
+};
 
 // Mouse support
 
