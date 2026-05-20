@@ -284,6 +284,45 @@
         object-fit: contain;
     }
 
+    #chatBox {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 200;
+        display: flex;
+        gap: 10px;
+    }
+
+    #chatInput {
+        padding: 10px;
+        border-radius: 10px;
+        border: none;
+        width: 220px;
+        font-size: 16px;
+    }
+
+    #chatBtn {
+        padding: 10px 16px;
+        border: none;
+        border-radius: 10px;
+        background: #7ed6ff;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    #playerText {
+        position: absolute;
+        background: rgba(255,255,255,0.9);
+        padding: 8px 14px;
+        border-radius: 14px;
+        font-size: 18px;
+        color: black;
+        white-space: nowrap;
+        display: none;
+        z-index: 100;
+    }
+
     #controls {
         position: absolute;
         bottom: 20px;
@@ -317,6 +356,13 @@
 </div>
 
 <div id="game">
+
+    <div id="chatBox">
+        <input type="text" id="chatInput" placeholder="Ketik chat...">
+        <button id="chatBtn">Chat</button>
+    </div>
+
+    <div id="playerText"></div>
 
     <div id="sun"></div>
     <div id="rainbow"></div>
@@ -390,6 +436,7 @@ let velocityY = 0;
 let isJumping = false;
 let moveLeft = false;
 let moveRight = false;
+let currentChat = "";
 
 playBtn.onclick = () => {
     menu.style.display = "none";
@@ -464,6 +511,11 @@ function createNPCs() {
 
 function update() {
 
+    const playerText = document.getElementById("playerText");
+
+    playerText.style.left = (playerX - 10) + "px";
+    playerText.style.bottom = (220 + playerY) + "px";
+
     if (moveLeft) playerX -= 5;
     if (moveRight) playerX += 5;
 
@@ -484,10 +536,33 @@ function update() {
 
 function jump() {
     if (!isJumping) {
+
+        if(currentChat.trim() !== "") {
+            const playerText = document.getElementById("playerText");
+            playerText.innerText = currentChat;
+            playerText.style.display = "block";
+
+            setTimeout(() => {
+                playerText.style.display = "none";
+            }, 3000);
+        }
+
         velocityY = 12;
         isJumping = true;
     }
 }
+
+document.getElementById("chatBtn").onclick = () => {
+    currentChat = document.getElementById("chatInput").value;
+    document.getElementById("chatInput").value = "";
+};
+
+document.getElementById("chatInput").addEventListener("keydown", e => {
+    if(e.key === "Enter") {
+        currentChat = document.getElementById("chatInput").value;
+        document.getElementById("chatInput").value = "";
+    }
+});
 
 // Keyboard
 
