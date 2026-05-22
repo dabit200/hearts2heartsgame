@@ -226,12 +226,14 @@
 
     #food {
         position: absolute;
-        width: 50px;
-        height: 50px;
-        background: yellow;
-        border-radius: 50%;
-        top: -25px;
-        left: 65px;
+        width: 70px;
+        height: 70px;
+        background-image: url('Cupcakes.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        top: -45px;
+        left: 55px;
         cursor: pointer;
     }
 
@@ -287,7 +289,7 @@
     #chatBox {
         position: absolute;
         top: 20px;
-        right: 20px;
+        left: 20px;
         z-index: 200;
         display: flex;
         gap: 10px;
@@ -537,15 +539,7 @@ function update() {
 function jump() {
     if (!isJumping) {
 
-        if(currentChat.trim() !== "") {
-            const playerText = document.getElementById("playerText");
-            playerText.innerText = currentChat;
-            playerText.style.display = "block";
-
-            setTimeout(() => {
-                playerText.style.display = "none";
-            }, 3000);
-        }
+        
 
         velocityY = 12;
         isJumping = true;
@@ -554,12 +548,22 @@ function jump() {
 
 document.getElementById("chatBtn").onclick = () => {
     currentChat = document.getElementById("chatInput").value;
+
+    const playerText = document.getElementById("playerText");
+    playerText.innerText = currentChat;
+    playerText.style.display = "block";
+
     document.getElementById("chatInput").value = "";
 };
 
 document.getElementById("chatInput").addEventListener("keydown", e => {
     if(e.key === "Enter") {
         currentChat = document.getElementById("chatInput").value;
+
+        const playerText = document.getElementById("playerText");
+        playerText.innerText = currentChat;
+        playerText.style.display = "block";
+
         document.getElementById("chatInput").value = "";
     }
 });
